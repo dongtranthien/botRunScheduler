@@ -24,14 +24,13 @@ const firebaseConfig = {
 // Initialize Firebase
 const firebaseApp = firebase.initializeApp(firebaseConfig);
 let database = firebase.database()
-function writeUserData(userId, name, email, imageUrl) {
-  set(ref(database, 'users/' + userId), {
-    username: name,
-    email: email,
-    profile_picture: imageUrl
-  });
+function writePost(postId, title, content) {
+  database.ref('post/' + postId).set({
+      title: title,
+      content: content
+    })
 }
-writeUserData(1, 'a', 'a@a.com', '');
+writePost(1, 'a', 'a@a.com');
 
 async function runApi(str) {
 
