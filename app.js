@@ -6,7 +6,8 @@ var logger = require('morgan');
 const { Telegraf } = require('telegraf');
 const axios = require('axios');
 // Import the functions you need from the SDKs you need
-const firebaseAdmin = require('firebase-admin')
+const firebaseAdmin = require('firebase-admin');
+const { uuid } = require('uuidv4');
 // Your web app's Firebase configuration
 console.log(process.env.serviceAccount,"process.env.serviceAccount")
 const firebaseConfig = {
