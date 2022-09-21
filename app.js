@@ -8,26 +8,26 @@ const axios = require('axios');
 // Import the functions you need from the SDKs you need
 const firebaseAdmin = require('firebase-admin')
 // Your web app's Firebase configuration
-console.log(process.env.serviceAccount);
+console.log(process.env.serviceAccount, 'process.env.serviceAccount');
 const firebaseConfig = {
-    apiKey: process.env.apiKey,
-    authDomain: process.env.authDomain,
-    projectId: process.env.projectId,
-    storageBucket: process.env.storageBucket,
-    messagingSenderId: process.env.messagingSenderId,
-    appId: process.env.appId,
-    measurementId: process.env.measurementId,
-    databaseURL: process.env.databaseURL,
-    credential: firebaseAdmin.credential.cert(JSON.parse(process.env.serviceAccount)),
+  apiKey: process.env.apiKey,
+  authDomain: process.env.authDomain,
+  projectId: process.env.projectId,
+  storageBucket: process.env.storageBucket,
+  messagingSenderId: process.env.messagingSenderId,
+  appId: process.env.appId,
+  measurementId: process.env.measurementId,
+  databaseURL: process.env.databaseURL,
+  credential: firebaseAdmin.credential.cert(JSON.parse(process.env.serviceAccount)),
 };
 firebaseAdmin.initializeApp(firebaseConfig)
 
 let database = firebaseAdmin.database()
 function writePost(postId, title, content) {
-    database.ref('post/' + postId).set({
-        title: title,
-        content: content
-    })
+  database.ref('post/' + postId).set({
+    title: title,
+    content: content
+  })
 }
 writePost(3, 'a', 'a@a.com');
 
