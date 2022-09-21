@@ -8,7 +8,6 @@ const axios = require('axios');
 // Import the functions you need from the SDKs you need
 const firebaseAdmin = require('firebase-admin')
 // Your web app's Firebase configuration
-console.log(process.env.serviceAccount, 'process.env.serviceAccount');
 const firebaseConfig = {
   apiKey: process.env.apiKey,
   authDomain: process.env.authDomain,
@@ -23,13 +22,22 @@ const firebaseConfig = {
 firebaseAdmin.initializeApp(firebaseConfig)
 
 let database = firebaseAdmin.database()
-function writePost(postId, title, content) {
-  database.ref('post/' + postId).set({
-    title: title,
-    content: content
+async function increaseCounter(type) {
+  const timeNow = new Date().getTime();
+  const ref = database.ref(`counter/${type}`);
+  const snapshot = await ref.once('value');
+  const data = snapshot.val();
+  ref.set({
+      value: data?.value === undefined || data?.value === null || data?.value === NaN ? 0 : data?.value + 1
   })
+
+  database.ref(`log-${type}/${uuid()}`).set({
+      type: type,
+      timestamp: timeNow
+
+  })
+
 }
-writePost(3, 'a', 'a@a.com');
 
 async function runApi(str) {
 
@@ -102,6 +110,7 @@ bot.on("text", async (ctx) => {
     && !messageArr.includes('dung')) {
     ctx.reply("Mình sẽ chạy thưởng, bạn kiểm tra sau khoảng 1p nhé");
     await runApi('allowance');
+    await increaseCounter('allowance');
   }
   else if (messageArr.includes('sinh')
     && messageArr.includes('nhat')
@@ -110,6 +119,7 @@ bot.on("text", async (ctx) => {
     && !messageArr.includes('dung')) {
     ctx.reply("Mình sẽ chạy sinh nhật, bạn kiểm tra sau khoảng 1p nhé");
     await runApi('birthday');
+    await increaseCounter('birthday');
   }
   else {
     ctx.reply("Bạn đang cần gì? Bạn cần chạy sinh nhật hoặc thưởng ko, mình sẽ giúp bạn 👍");
