@@ -6,8 +6,8 @@ var logger = require('morgan');
 const { Telegraf } = require('telegraf');
 const axios = require('axios');
 // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getDatabase } from "firebase/database";
+const { initializeApp } = require("firebase/app");
+const { getDatabase } = require("firebase/database");
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
