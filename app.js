@@ -17,7 +17,7 @@ const firebaseConfig = {
   appId: process.env.appId,
   measurementId: process.env.measurementId,
   databaseURL: process.env.databaseURL,
-  credential: firebaseAdmin.credential.cert(process.env.serviceAccount),
+  credential: firebaseAdmin.credential.cert(JSON.parse(process.env.serviceAccount)),
 };
 firebaseAdmin.initializeApp(firebaseConfig)
 
