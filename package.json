@@ -18,6 +18,7 @@
     "mersenne-twister": "^1.1.0",
     "morgan": "~1.9.1",
     "pug": "^2.0.4",
+    "sqlite3": "^5.1.1",
     "telegraf": "^4.9.2",
     "uglify-js": "^2.6.0"
   }
