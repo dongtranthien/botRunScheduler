@@ -8,6 +8,7 @@ const axios = require('axios');
 // Import the functions you need from the SDKs you need
 const firebaseAdmin = require('firebase-admin')
 // Your web app's Firebase configuration
+console.log(process.env.serviceAccount,"process.env.serviceAccount")
 const firebaseConfig = {
   apiKey: process.env.apiKey,
   authDomain: process.env.authDomain,
