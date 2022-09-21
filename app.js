@@ -6,8 +6,8 @@ var logger = require('morgan');
 const { Telegraf } = require('telegraf');
 const axios = require('axios');
 // Import the functions you need from the SDKs you need
-const { initializeApp } = require("firebase/app");
-const { getDatabase } = require("firebase/database");
+var firebase = require('firebase')
+
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -22,11 +22,10 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const firebaseApp = initializeApp(firebaseConfig);
-const database = getDatabase(firebaseApp);
+const firebaseApp = firebase.initializeApp(firebaseConfig);
+let database = firebase.database()
 function writeUserData(userId, name, email, imageUrl) {
-  const db = getDatabase(firebaseApp);
-  set(ref(db, 'users/' + userId), {
+  set(ref(database, 'users/' + userId), {
     username: name,
     email: email,
     profile_picture: imageUrl
