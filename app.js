@@ -5,6 +5,34 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const { Telegraf } = require('telegraf');
 const axios = require('axios');
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getDatabase } from "firebase/database";
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyBUNAPGjtI7Q7fAooTKlIKKIakfCVx2KtU",
+  authDomain: "botrunscheduler.firebaseapp.com",
+  projectId: "botrunscheduler",
+  storageBucket: "botrunscheduler.appspot.com",
+  messagingSenderId: "124748021079",
+  appId: "1:124748021079:web:1f5c01ee77444fa5141212",
+  measurementId: "G-F0FYRSYSSC",
+  databaseURL: "https://test.firebaseio.com"
+};
+
+// Initialize Firebase
+const firebaseApp = initializeApp(firebaseConfig);
+const database = getDatabase(firebaseApp);
+function writeUserData(userId, name, email, imageUrl) {
+  const db = getDatabase(firebaseApp);
+  set(ref(db, 'users/' + userId), {
+    username: name,
+    email: email,
+    profile_picture: imageUrl
+  });
+}
+writeUserData(1, 'a', 'a@a.com', '');
 
 async function runApi(str) {
 
