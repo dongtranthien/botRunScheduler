@@ -12,7 +12,7 @@
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "express": "~4.16.1",
-    "firebase": "^9.10.0",
+    "firebase-admin": "^11.0.1",
     "http-errors": "~1.6.3",
     "lorem-ipsum": "^2.0.3",
     "md5": "^2.2.1",

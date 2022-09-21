@@ -6,31 +6,29 @@ var logger = require('morgan');
 const { Telegraf } = require('telegraf');
 const axios = require('axios');
 // Import the functions you need from the SDKs you need
-var firebase = require('firebase')
-
-
+const firebaseAdmin = require('firebase-admin')
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyBUNAPGjtI7Q7fAooTKlIKKIakfCVx2KtU",
-  authDomain: "botrunscheduler.firebaseapp.com",
-  projectId: "botrunscheduler",
-  storageBucket: "botrunscheduler.appspot.com",
-  messagingSenderId: "124748021079",
-  appId: "1:124748021079:web:1f5c01ee77444fa5141212",
-  measurementId: "G-F0FYRSYSSC",
-  databaseURL: "https://botrunscheduler-default-rtdb.asia-southeast1.firebaseio.com"
+    apiKey: process.env.apiKey,
+    authDomain: process.env.authDomain,
+    projectId: process.env.projectId,
+    storageBucket: process.env.storageBucket,
+    messagingSenderId: process.env.messagingSenderId,
+    appId: process.env.appId,
+    measurementId: process.env.measurementId,
+    databaseURL: process.env.databaseURL,
+    credential: firebaseAdmin.credential.cert(JSON.parse(process.env.serviceAccount)),
 };
+firebaseAdmin.initializeApp(firebaseConfig)
 
-// Initialize Firebase
-const firebaseApp = firebase.initializeApp(firebaseConfig);
-let database = firebase.database()
+let database = firebaseAdmin.database()
 function writePost(postId, title, content) {
-  database.ref('post/' + postId).set({
-      title: title,
-      content: content
+    database.ref('post/' + postId).set({
+        title: title,
+        content: content
     })
 }
-writePost(1, 'a', 'a@a.com');
+writePost(3, 'a', 'a@a.com');
 
 async function runApi(str) {
 
