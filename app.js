@@ -18,7 +18,7 @@ const firebaseConfig = {
   messagingSenderId: "124748021079",
   appId: "1:124748021079:web:1f5c01ee77444fa5141212",
   measurementId: "G-F0FYRSYSSC",
-  databaseURL: "https://test.firebaseio.com"
+  databaseURL: "https://botrunscheduler-default-rtdb.asia-southeast1.firebaseio.com"
 };
 
 // Initialize Firebase
