@@ -24,7 +24,7 @@ const firebaseConfig = {
 firebaseAdmin.initializeApp(firebaseConfig)
 
 let database = firebaseAdmin.database()
-async function increaseCounter(type) {
+async function increaseCounter(type, fromData) {
   const timeNow = new Date().getTime();
   const ref = database.ref(`counter/${type}`);
   const snapshot = await ref.once('value');
@@ -35,8 +35,8 @@ async function increaseCounter(type) {
 
   database.ref(`log-${type}/${uuid()}`).set({
     type: type,
-    timestamp: timeNow
-
+    timestamp: timeNow,
+    from: fromData
   })
 
 }
@@ -119,7 +119,7 @@ bot.on("text", async (ctx) => {
     && !messageArr.includes('dung')) {
     ctx.reply("Mình sẽ chạy thưởng, bạn kiểm tra sau khoảng 1p nhé");
     await runApi('allowance');
-    await increaseCounter('allowance');
+    await increaseCounter('allowance', ctx.update.message.from);
   }
   else if (messageArr.includes('sinh')
     && messageArr.includes('nhat')
@@ -128,7 +128,7 @@ bot.on("text", async (ctx) => {
     && !messageArr.includes('dung')) {
     ctx.reply("Mình sẽ chạy sinh nhật, bạn kiểm tra sau khoảng 1p nhé");
     await runApi('birthday');
-    await increaseCounter('birthday');
+    await increaseCounter('birthday', ctx.update.message.from);
   }
   else if (message.includes('tong ket')) {
     let counter = await getCounter();
