@@ -9,7 +9,7 @@ const axios = require('axios');
 const firebaseAdmin = require('firebase-admin');
 const { uuid } = require('uuidv4');
 // Your web app's Firebase configuration
-console.log(process.env.serviceAccount,"process.env.serviceAccount")
+
 const firebaseConfig = {
   apiKey: process.env.apiKey,
   authDomain: process.env.authDomain,
@@ -30,15 +30,22 @@ async function increaseCounter(type) {
   const snapshot = await ref.once('value');
   const data = snapshot.val();
   ref.set({
-      value: data?.value === undefined || data?.value === null || data?.value === NaN ? 0 : data?.value + 1
+    value: data?.value === undefined || data?.value === null || data?.value === NaN ? 0 : data?.value + 1
   })
 
   database.ref(`log-${type}/${uuid()}`).set({
-      type: type,
-      timestamp: timeNow
+    type: type,
+    timestamp: timeNow
 
   })
 
+}
+
+async function getCounter() {
+  const ref = database.ref('counter');
+  const snapshot = await ref.once('value');
+  const data = snapshot.val();
+  console.log(data)
 }
 
 async function runApi(str) {
@@ -104,7 +111,7 @@ bot.on("text", async (ctx) => {
   message = message.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   // remove sticker
   message = message.replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '');
-
+  console.log(ctx.update.message, 'ctx.update.message')
   const idUser = ctx.update.message.from.id;
   const messageArr = message.split(' ');
   if (messageArr.includes('thuong')
@@ -122,6 +129,12 @@ bot.on("text", async (ctx) => {
     ctx.reply("Mình sẽ chạy sinh nhật, bạn kiểm tra sau khoảng 1p nhé");
     await runApi('birthday');
     await increaseCounter('birthday');
+  }
+  else if (messageArr.includes('tong ket')) {
+    let counter = getCounter();
+    ctx.telegram.sendMessage(`Bạn đã chạy ${counter.birthday.value} lần sinh nhật và ${counter.allowance.value} lần thưởng`)
+
+    ctx.reply('Mình vẫn đang sẵn sàng phục vụ bạn!');
   }
   else {
     ctx.reply("Bạn đang cần gì? Bạn cần chạy sinh nhật hoặc thưởng ko, mình sẽ giúp bạn 👍");
