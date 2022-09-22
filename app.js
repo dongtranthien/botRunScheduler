@@ -133,8 +133,7 @@ bot.on("text", async (ctx) => {
   else if (message.includes('tong ket')) {
     let counter = await getCounter();
     console.log(counter, 'counter')
-    ctx.telegram.sendMessage(`Bạn đã chạy ${counter.birthday.value} lần sinh nhật và ${counter.allowance.value} lần thưởng`)
-
+    ctx.reply(`Bạn đã chạy ${counter.birthday.value} lần sinh nhật và ${counter.allowance.value} lần thưởng`)
     ctx.reply('Mình vẫn đang sẵn sàng phục vụ bạn!');
   }
   else {
