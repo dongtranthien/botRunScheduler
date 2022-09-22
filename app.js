@@ -131,7 +131,7 @@ bot.on("text", async (ctx) => {
     await increaseCounter('birthday');
   }
   else if (message.includes('tong ket')) {
-    let counter = getCounter();
+    let counter = await getCounter();
     ctx.telegram.sendMessage(`Bạn đã chạy ${counter.birthday.value} lần sinh nhật và ${counter.allowance.value} lần thưởng`)
 
     ctx.reply('Mình vẫn đang sẵn sàng phục vụ bạn!');
