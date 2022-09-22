@@ -45,7 +45,7 @@ async function getCounter() {
   const ref = database.ref('counter');
   const snapshot = await ref.once('value');
   const data = snapshot.val();
-  console.log(data)
+  return data;
 }
 
 async function runApi(str) {
@@ -132,6 +132,7 @@ bot.on("text", async (ctx) => {
   }
   else if (message.includes('tong ket')) {
     let counter = await getCounter();
+    console.log(counter, 'counter')
     ctx.telegram.sendMessage(`Bạn đã chạy ${counter.birthday.value} lần sinh nhật và ${counter.allowance.value} lần thưởng`)
 
     ctx.reply('Mình vẫn đang sẵn sàng phục vụ bạn!');
