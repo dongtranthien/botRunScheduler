@@ -245,6 +245,10 @@ bot.on("callback_query", async (ctx) => {
 
       const campaign = await portalApi.createCampaign(publisher.id);
 
+      const po = await portalApi.createPO(publisher.id, campaign.id);
+
+      //const subPo = portalApi.createSubPO(po.id);
+
       ctx.editMessageText(
         CreateCampaignMsg(
           publisher.title,

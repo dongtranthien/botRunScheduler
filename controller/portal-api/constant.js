@@ -2,6 +2,8 @@
  const PortalServiceUrl = {
   Publisher: "/publishers",
   Campaign: "/campaigns",
+  Po: "/pos",
+  SubPo: "/sub-pos",
 };
 
 module.exports = { PortalUrl, PortalServiceUrl };
