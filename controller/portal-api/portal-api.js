@@ -1,5 +1,23 @@
 const axios = require("axios");
-const { PortalUrl, PortalServiceUrl } = require("./constant");
+var xl = require("excel4node");
+const fs = require("fs");
+const FormData = require("form-data");
+const {
+  PortalUrl,
+  PortalServiceUrl,
+  IdentifiedTypeImport,
+} = require("./constant");
+
+async function runApi(str) {
+  let payload = {};
+
+  let res = await axios.post(
+    `http://urcard-portal-api.urbox.dev/testings/run-${str}`,
+    payload
+  );
+
+  let data = res.data;
+}
 
 const createRandomPublisher = async () => {
   let payload = {
@@ -88,8 +106,8 @@ const createPO = async (publisherId, campaignId) => {
   let payload = {
     amount: 100000000,
     availableAmount: 100000000,
-    publisherId: 1,
-    campaignId: 827,
+    publisherId: publisherId,
+    campaignId: campaignId,
     poDate: new Date(),
     status: "activated",
     allocation: "one",
@@ -131,9 +149,99 @@ const createSubPO = async (poId) => {
   return data;
 };
 
+const createCardIssue = async (publisherId, campaignId) => {
+  let payload = {
+    publisherId,
+    campaignId,
+    initialQuantity: 5,
+    status: "activated",
+    designTemplateId: 2,
+    expiration: {
+      type: "duration",
+      duration: "1y",
+    },
+    initialAmount: 100000,
+    initialProducts: [],
+    params: {},
+    channel: "app",
+    serial: null,
+    tags: [],
+  };
+
+  let res = await axios.post(
+    `${PortalUrl}${PortalServiceUrl.CardIssue}`,
+    payload,
+    {
+      headers: {
+        Authorization:
+          "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6ImFjY2VzcyJ9.eyJ1c2VyIjp7ImlkIjo5MzU0LCJlbWFpbCI6InRhbi5udEB1cmJveC52biJ9LCJwYXJ0bmVyVG9rZW4iOiJleUpoYkdjaU9pSlNVekkxTmlJc0luUjVjQ0k2SWtwWFZDSjkuZXlKbGVIQWlPakUyTnpZME16UXpNemNzSW1saGRDSTZNVFkyT0RZMU9ETXpOeXdpY0dGeWRHNWxjbDlwWkNJNk1UTXNJbkp2YkdWZmFXUWlPakl6T1Rnc0luVnpaWEpmYVdRaU9qa3pOVFI5LkpkWTcxdTZSUzhVckttWHg2RW9ybWwwdWpvVVk3OVZZMnNJaDQ2dk1jNl9OSWI2UFJveGN6XzJzb29TWENPbWxpVWc3b0FBQW9HT3NZWVJZdXVZOE5NSmNsSUZOc185WHJXcWlBZ19yenJEUXF3V3VIdXJNTk93bHl4V2czZmcxaDIzaS1FTS1nUVAtck5saVpaU2ZlSmJoMWxWUFRWRnlHbXlBUGJxcW1mdyIsImlhdCI6MTY2ODY1ODMzNywiZXhwIjoxNjY5MjYzMTM3LCJpc3MiOiJmZWF0aGVycyIsImp0aSI6ImUxNDNjMjc0LWYyMWEtNGY1NS05NzcyLWFkNmNiYzk1ZmE5YyJ9.qh0QGO35DGfFrW7F--z4GKXYppMbmTdcj81bJDNqTf0",
+      },
+    }
+  );
+
+  let data = res.data;
+  return data;
+};
+
+const importXlsx = async (cardIssueId, subPOId, type, code, ranks) => {
+  console.log(cardIssueId, subPOId, type, code, ranks);
+  // Create xlsx file
+  var wb = new xl.Workbook();
+  // Add Worksheets to the workbook
+  var ws = wb.addWorksheet("Sheet 1");
+  if (type === IdentifiedTypeImport.Phone) {
+    ws.cell(1, 1).string("Phone");
+    ws.cell(2, 1).string(code);
+  } else {
+    ws.cell(1, 1).string("CIF");
+    ws.cell(2, 1).string(code);
+    ws.cell(2, 2).string("User Test");
+    ws.cell(2, 3).string("1990/01/01");
+    ws.cell(2, 4).string("");
+    ws.cell(2, 5).string("");
+    ws.cell(2, 6).string("");
+    ws.cell(2, 7).string(ranks);
+    ws.cell(2, 8).string("");
+    ws.cell(2, 9).string("");
+  }
+
+  wb.write("Excel.xlsx");
+
+  var form = new FormData();
+  form.append("isSendSMS", "false");
+  form.append("cardIssueId", cardIssueId);
+  form.append("subPOId", subPOId);
+  form.append("file", fs.createReadStream("Excel.xlsx"));
+  console.log(form.getHeaders(), "formData.getHeaders()");
+
+  let res;
+  try {
+    res = await axios.post(
+      `${PortalUrl}${PortalServiceUrl.CardIssueImportCard}`,
+      form,
+      {
+        headers: {
+          ...form.getHeaders(),
+          Authorization:
+            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6ImFjY2VzcyJ9.eyJ1c2VyIjp7ImlkIjo5MzU0LCJlbWFpbCI6InRhbi5udEB1cmJveC52biJ9LCJwYXJ0bmVyVG9rZW4iOiJleUpoYkdjaU9pSlNVekkxTmlJc0luUjVjQ0k2SWtwWFZDSjkuZXlKbGVIQWlPakUyTnpZME16UXpNemNzSW1saGRDSTZNVFkyT0RZMU9ETXpOeXdpY0dGeWRHNWxjbDlwWkNJNk1UTXNJbkp2YkdWZmFXUWlPakl6T1Rnc0luVnpaWEpmYVdRaU9qa3pOVFI5LkpkWTcxdTZSUzhVckttWHg2RW9ybWwwdWpvVVk3OVZZMnNJaDQ2dk1jNl9OSWI2UFJveGN6XzJzb29TWENPbWxpVWc3b0FBQW9HT3NZWVJZdXVZOE5NSmNsSUZOc185WHJXcWlBZ19yenJEUXF3V3VIdXJNTk93bHl4V2czZmcxaDIzaS1FTS1nUVAtck5saVpaU2ZlSmJoMWxWUFRWRnlHbXlBUGJxcW1mdyIsImlhdCI6MTY2ODY1ODMzNywiZXhwIjoxNjY5MjYzMTM3LCJpc3MiOiJmZWF0aGVycyIsImp0aSI6ImUxNDNjMjc0LWYyMWEtNGY1NS05NzcyLWFkNmNiYzk1ZmE5YyJ9.qh0QGO35DGfFrW7F--z4GKXYppMbmTdcj81bJDNqTf0",
+        },
+      }
+    );
+  } catch (error) {
+    throw error;
+  }
+
+  let data = res?.data;
+  console.log(data, "adsf");
+  return { data, code, ranks };
+};
+
 module.exports = {
+  runApi,
   createRandomPublisher,
   createCampaign,
   createPO,
   createSubPO,
+  createCardIssue,
+  importXlsx,
 };

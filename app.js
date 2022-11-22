@@ -5,34 +5,17 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 const { Telegraf, Markup, Extra } = require("telegraf");
 const { Keyboard, Key } = require("telegram-keyboard");
-const axios = require("axios");
-// Import the functions you need from the SDKs you need
-const firebaseAdmin = require("firebase-admin");
 const { uuid } = require("uuidv4");
 const portalApi = require("./controller/portal-api/portal-api.js");
 const {
   CreatePublisherRandomMsg,
   CreateCampaignMsg,
 } = require("./utils/message");
+const { RemoveMarkAndSticker } = require("./utils/common");
+const { IdentifiedTypeImport } = require("./controller/portal-api/constant");
+const database = require("./firebase");
 require("dotenv").config();
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: process.env.apiKey,
-  authDomain: process.env.authDomain,
-  projectId: process.env.projectId,
-  storageBucket: process.env.storageBucket,
-  messagingSenderId: process.env.messagingSenderId,
-  appId: process.env.appId,
-  measurementId: process.env.measurementId,
-  databaseURL: process.env.databaseURL,
-  credential: firebaseAdmin.credential.cert(
-    JSON.parse(process.env.serviceAccount)
-  ),
-};
-firebaseAdmin.initializeApp(firebaseConfig);
-
-let database = firebaseAdmin.database();
 async function increaseCounter(type, fromData) {
   const timeNow = new Date().getTime();
   const ref = database.ref(`counter/${type}`);
@@ -59,23 +42,11 @@ async function getCounter() {
   return data;
 }
 
-async function runApi(str) {
-  let payload = {};
-
-  let res = await axios.post(
-    `http://urcard-portal-api.urbox.dev/testings/run-${str}`,
-    payload
-  );
-
-  let data = res.data;
-}
-
 var indexRouter = require("./routes/index");
 // var usersRouter = require('./routes/users');
 
 var app = express();
 
-// view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
 
@@ -104,27 +75,14 @@ app.use(function (err, req, res, next) {
   res.render("error");
 });
 
-function sleep(ms) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
-
 const bot = new Telegraf(process.env.botToken);
-const groupId = -634909714;
 //bot.start((ctx) => ctx.reply('Welcome'));
 bot.help((ctx) => ctx.reply("Bạn cần mình chạy thưởng hay sinh nhật nè 👍"));
-//bot.on('sticker', (ctx) => ctx.reply('👍'));
-//bot.hears('hi', (ctx) => ctx.reply('Hey there'));
+bot.on("sticker", (ctx) => ctx.reply("👍"));
+//bot.hears("hi", (ctx) => ctx.reply("Hey there"));
 bot.on("text", async (ctx) => {
-  let message = ctx.update.message.text;
-  // remove mark text
-  message = message.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  // remove sticker
-  message = message.replace(
-    /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g,
-    ""
-  );
+  console.log(ctx, "texttext");
+  let message = RemoveMarkAndSticker(ctx.update.message.text);
 
   const idUser = ctx.update.message.from.id;
   const messageArr = message.split(" ");
@@ -136,7 +94,7 @@ bot.on("text", async (ctx) => {
     message === "/allowance"
   ) {
     ctx.reply("Mình sẽ chạy thưởng, bạn kiểm tra sau khoảng 1p nhé");
-    runApi("allowance");
+    portalApi.runApi("allowance");
     increaseCounter("allowance", ctx.update.message.from);
   } else if (
     (messageArr.includes("sinh") &&
@@ -148,7 +106,7 @@ bot.on("text", async (ctx) => {
     message === "/birthday"
   ) {
     ctx.reply("Mình sẽ chạy sinh nhật, bạn kiểm tra sau khoảng 1p nhé");
-    runApi("birthday");
+    portalApi.runApi("birthday");
     increaseCounter("birthday", ctx.update.message.from);
   } else if (message.includes("tong ket") || message.includes("thong ke")) {
     let counter = await getCounter();
@@ -171,9 +129,93 @@ bot.on("text", async (ctx) => {
       "<pre>       <b>Urcard Dev Feature</b>   &#x200D;</pre>",
       keyboard.inline()
     );
+  } else if (message === "/quick") {
+    const keyboard = Keyboard.make([
+      [Key.callback("Identified Phone", "quick-identified-phone")],
+      [
+        Key.callback(
+          "Identified partner code Cif",
+          "quick-identified-partner-code-cif"
+        ),
+      ],
+    ]);
+
+    //await ctx.reply("Simple built-in keyboard", keyboard.reply());
+    ctx.replyWithHTML(
+      "<pre><b>Quick Functions of Urcard Dev</b>&#x200D;</pre>",
+      keyboard.inline()
+    );
+  } else if (message[0] === "/") {
+    const id = ctx.update.message.from.id;
+    const ref = database.ref(`callback/${ctx.update.message.from.id}`);
+    const snapshot = await ref.once("value");
+    const data = snapshot.val();
+
+    switch (data.type) {
+      case "identified-phone-import": {
+        const publisher = await portalApi.createRandomPublisher();
+
+        const campaign = await portalApi.createCampaign(publisher.id);
+
+        const po = await portalApi.createPO(publisher.id, campaign.id);
+
+        const subPo = await portalApi.createSubPO(po.id);
+
+        const cardIssue = await portalApi.createCardIssue(
+          publisher.id,
+          campaign.id
+        );
+
+        const phoneNumber = message.substring(1, message.length);
+        const result = await portalApi.importXlsx(
+          cardIssue.id,
+          subPo.id,
+          IdentifiedTypeImport.Phone,
+          phoneNumber
+        );
+        console.log(result, "resultresult");
+
+        ctx.replyWithHTML(
+          `<b>Create successful - identified phone</b>\n⛵️ Phone number: ${result.code}\n`
+        );
+
+        return;
+      }
+      case "identified-partner-code-cif": {
+        const obj = message.substring(1, message.length).split(",");
+        let result;
+        try {
+          result = await portalApi.importXlsx(
+            1306,
+            542,
+            IdentifiedTypeImport.Cif,
+            obj[0],
+            obj[1]
+          );
+        } catch (error) {
+          ctx.replyWithHTML(
+            `<pre><b>Create failed: ${error.response.data.message}</b>&#x200D;</pre>`
+          );
+          return;
+        }
+
+        ctx.replyWithHTML("<pre><b>Create successful</b>&#x200D;</pre>");
+
+        return;
+      }
+    }
+
+    const keyboard = Keyboard.make([
+      [Key.callback("A", "quick-identified-phone")],
+    ]);
+
+    //await ctx.reply("Simple built-in keyboard", keyboard.reply());
+    ctx.replyWithHTML(
+      "<pre><b>Quick Functions of Urcard Dev</b>&#x200D;</pre>",
+      keyboard.inline()
+    );
   }
 });
-let index = 1;
 bot.on("callback_query", async (ctx) => {
   const data = ctx.update.callback_query.data;
   switch (data) {
@@ -247,7 +289,7 @@ bot.on("callback_query", async (ctx) => {
 
       const po = await portalApi.createPO(publisher.id, campaign.id);
 
-      //const subPo = portalApi.createSubPO(po.id);
+      const subPo = portalApi.createSubPO(po.id);
 
       ctx.editMessageText(
         CreateCampaignMsg(
@@ -280,6 +322,103 @@ bot.on("callback_query", async (ctx) => {
       );
       break;
     }
+    case "quick-identified-phone": {
+      ctx.editMessageText(
+        "<pre><b>Enter your phone number to create(with / before to create) or</b>&#x200D;</pre>",
+        {
+          ...Markup.inlineKeyboard([
+            [
+              Key.callback(
+                "Create random phone number",
+                "quick-identified-phone-random"
+              ),
+            ],
+            [Key.callback("<< Back", "back-quick")],
+          ]),
+          parse_mode: "HTML",
+        }
+      );
+      const timeNow = new Date().getTime();
+      const obj = {};
+      obj[timeNow] = {
+        data: JSON.stringify(ctx),
+      };
+      database
+        .ref(`callback/${ctx.update.callback_query.from.id}`)
+        .set({ time: timeNow, type: "identified-phone-import" });
+      break;
+    }
+    case "quick-identified-partner-code-cif": {
+      ctx.editMessageText(
+        "<pre><b>Enter your cif to create(with / before to create) or</b>&#x200D;</pre>",
+        {
+          ...Markup.inlineKeyboard([
+            [
+              Key.callback(
+                "Create random cif",
+                "quick-identified-partner-code-cif-random"
+              ),
+            ],
+            [Key.callback("<< Back", "back-quick")],
+          ]),
+          parse_mode: "HTML",
+        }
+      );
+      const timeNow = new Date().getTime();
+      const obj = {};
+      obj[timeNow] = {
+        data: JSON.stringify(ctx),
+      };
+      database
+        .ref(`callback/${ctx.update.callback_query.from.id}`)
+        .set({ time: timeNow, type: "identified-partner-code-cif" });
+      break;
+    }
+    case "quick-identified-partner-code-cif-random": {
+      let result;
+      try {
+        result = await portalApi.importXlsx(
+          1306,
+          542,
+          IdentifiedTypeImport.Cif,
+          (new Date().getTime() / 1000).toFixed(),
+          "Diamond Elite"
+        );
+      } catch (error) {
+        ctx.replyWithHTML(
+          `<pre><b>Create failed: ${error.response.data.message}</b>&#x200D;</pre>`
+        );
+        return;
+      }
+
+      ctx.editMessageText(
+        `<b>Create successful - identified cif code</b>\n🛴 Cif: ${result.code}\n🚲Ranks: ${result.ranks}`,
+        {
+          parse_mode: "HTML",
+        }
+      );
+
+      break;
+    }
+    case "back-quick": {
+      //await ctx.reply("Simple built-in keyboard", keyboard.reply());
+      ctx.editMessageText(
+        "<pre><b>Quick Functions of Urcard Dev</b>&#x200D;</pre>",
+        {
+          ...Markup.inlineKeyboard([
+            [Key.callback("Identified Phone", "quick-identified-phone")],
+            [
+              Key.callback(
+                "Identified partner code Cif",
+                "quick-identified-partner-code-cif"
+              ),
+            ],
+          ]),
+          parse_mode: "HTML",
+        }
+      );
+      break;
+    }
     default: {
       ctx.editMessageText(
         "<pre>      <b>Feature is updating..</b> &#x200D;</pre>",
@@ -295,6 +434,6 @@ bot.on("callback_query", async (ctx) => {
 
 //setInterval(() => { bot.telegram.sendMessage(-634909714, 'hihi') }, 5000);
 bot.launch();
-bot.telegram.sendMessage(1739190630, "sdf");
+//bot.telegram.sendMessage(1739190630, "UrBox Dev");
 
 module.exports = app;
