@@ -6,6 +6,7 @@ const {
   PortalUrl,
   PortalServiceUrl,
   IdentifiedTypeImport,
+  Token,
 } = require("./constant");
 
 async function runApi(str) {
@@ -37,8 +38,7 @@ const createRandomPublisher = async () => {
     payload,
     {
       headers: {
-        Authorization:
-          "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6ImFjY2VzcyJ9.eyJ1c2VyIjp7ImlkIjo5MzU0LCJlbWFpbCI6InRhbi5udEB1cmJveC52biJ9LCJwYXJ0bmVyVG9rZW4iOiJleUpoYkdjaU9pSlNVekkxTmlJc0luUjVjQ0k2SWtwWFZDSjkuZXlKbGVIQWlPakUyTnpZME16UXpNemNzSW1saGRDSTZNVFkyT0RZMU9ETXpOeXdpY0dGeWRHNWxjbDlwWkNJNk1UTXNJbkp2YkdWZmFXUWlPakl6T1Rnc0luVnpaWEpmYVdRaU9qa3pOVFI5LkpkWTcxdTZSUzhVckttWHg2RW9ybWwwdWpvVVk3OVZZMnNJaDQ2dk1jNl9OSWI2UFJveGN6XzJzb29TWENPbWxpVWc3b0FBQW9HT3NZWVJZdXVZOE5NSmNsSUZOc185WHJXcWlBZ19yenJEUXF3V3VIdXJNTk93bHl4V2czZmcxaDIzaS1FTS1nUVAtck5saVpaU2ZlSmJoMWxWUFRWRnlHbXlBUGJxcW1mdyIsImlhdCI6MTY2ODY1ODMzNywiZXhwIjoxNjY5MjYzMTM3LCJpc3MiOiJmZWF0aGVycyIsImp0aSI6ImUxNDNjMjc0LWYyMWEtNGY1NS05NzcyLWFkNmNiYzk1ZmE5YyJ9.qh0QGO35DGfFrW7F--z4GKXYppMbmTdcj81bJDNqTf0",
+        Authorization: Token,
       },
     }
   );
@@ -92,8 +92,7 @@ const createCampaign = async (publisherId) => {
     payload,
     {
       headers: {
-        Authorization:
-          "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6ImFjY2VzcyJ9.eyJ1c2VyIjp7ImlkIjo5MzU0LCJlbWFpbCI6InRhbi5udEB1cmJveC52biJ9LCJwYXJ0bmVyVG9rZW4iOiJleUpoYkdjaU9pSlNVekkxTmlJc0luUjVjQ0k2SWtwWFZDSjkuZXlKbGVIQWlPakUyTnpZME16UXpNemNzSW1saGRDSTZNVFkyT0RZMU9ETXpOeXdpY0dGeWRHNWxjbDlwWkNJNk1UTXNJbkp2YkdWZmFXUWlPakl6T1Rnc0luVnpaWEpmYVdRaU9qa3pOVFI5LkpkWTcxdTZSUzhVckttWHg2RW9ybWwwdWpvVVk3OVZZMnNJaDQ2dk1jNl9OSWI2UFJveGN6XzJzb29TWENPbWxpVWc3b0FBQW9HT3NZWVJZdXVZOE5NSmNsSUZOc185WHJXcWlBZ19yenJEUXF3V3VIdXJNTk93bHl4V2czZmcxaDIzaS1FTS1nUVAtck5saVpaU2ZlSmJoMWxWUFRWRnlHbXlBUGJxcW1mdyIsImlhdCI6MTY2ODY1ODMzNywiZXhwIjoxNjY5MjYzMTM3LCJpc3MiOiJmZWF0aGVycyIsImp0aSI6ImUxNDNjMjc0LWYyMWEtNGY1NS05NzcyLWFkNmNiYzk1ZmE5YyJ9.qh0QGO35DGfFrW7F--z4GKXYppMbmTdcj81bJDNqTf0",
+        Authorization: Token,
       },
     }
   );
@@ -116,8 +115,7 @@ const createPO = async (publisherId, campaignId) => {
 
   let res = await axios.post(`${PortalUrl}${PortalServiceUrl.Po}`, payload, {
     headers: {
-      Authorization:
-        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6ImFjY2VzcyJ9.eyJ1c2VyIjp7ImlkIjo5MzU0LCJlbWFpbCI6InRhbi5udEB1cmJveC52biJ9LCJwYXJ0bmVyVG9rZW4iOiJleUpoYkdjaU9pSlNVekkxTmlJc0luUjVjQ0k2SWtwWFZDSjkuZXlKbGVIQWlPakUyTnpZME16UXpNemNzSW1saGRDSTZNVFkyT0RZMU9ETXpOeXdpY0dGeWRHNWxjbDlwWkNJNk1UTXNJbkp2YkdWZmFXUWlPakl6T1Rnc0luVnpaWEpmYVdRaU9qa3pOVFI5LkpkWTcxdTZSUzhVckttWHg2RW9ybWwwdWpvVVk3OVZZMnNJaDQ2dk1jNl9OSWI2UFJveGN6XzJzb29TWENPbWxpVWc3b0FBQW9HT3NZWVJZdXVZOE5NSmNsSUZOc185WHJXcWlBZ19yenJEUXF3V3VIdXJNTk93bHl4V2czZmcxaDIzaS1FTS1nUVAtck5saVpaU2ZlSmJoMWxWUFRWRnlHbXlBUGJxcW1mdyIsImlhdCI6MTY2ODY1ODMzNywiZXhwIjoxNjY5MjYzMTM3LCJpc3MiOiJmZWF0aGVycyIsImp0aSI6ImUxNDNjMjc0LWYyMWEtNGY1NS05NzcyLWFkNmNiYzk1ZmE5YyJ9.qh0QGO35DGfFrW7F--z4GKXYppMbmTdcj81bJDNqTf0",
+      Authorization: Token,
     },
   });
 
@@ -140,8 +138,7 @@ const createSubPO = async (poId) => {
 
   let res = await axios.post(`${PortalUrl}${PortalServiceUrl.SubPo}`, payload, {
     headers: {
-      Authorization:
-        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6ImFjY2VzcyJ9.eyJ1c2VyIjp7ImlkIjo5MzU0LCJlbWFpbCI6InRhbi5udEB1cmJveC52biJ9LCJwYXJ0bmVyVG9rZW4iOiJleUpoYkdjaU9pSlNVekkxTmlJc0luUjVjQ0k2SWtwWFZDSjkuZXlKbGVIQWlPakUyTnpZME16UXpNemNzSW1saGRDSTZNVFkyT0RZMU9ETXpOeXdpY0dGeWRHNWxjbDlwWkNJNk1UTXNJbkp2YkdWZmFXUWlPakl6T1Rnc0luVnpaWEpmYVdRaU9qa3pOVFI5LkpkWTcxdTZSUzhVckttWHg2RW9ybWwwdWpvVVk3OVZZMnNJaDQ2dk1jNl9OSWI2UFJveGN6XzJzb29TWENPbWxpVWc3b0FBQW9HT3NZWVJZdXVZOE5NSmNsSUZOc185WHJXcWlBZ19yenJEUXF3V3VIdXJNTk93bHl4V2czZmcxaDIzaS1FTS1nUVAtck5saVpaU2ZlSmJoMWxWUFRWRnlHbXlBUGJxcW1mdyIsImlhdCI6MTY2ODY1ODMzNywiZXhwIjoxNjY5MjYzMTM3LCJpc3MiOiJmZWF0aGVycyIsImp0aSI6ImUxNDNjMjc0LWYyMWEtNGY1NS05NzcyLWFkNmNiYzk1ZmE5YyJ9.qh0QGO35DGfFrW7F--z4GKXYppMbmTdcj81bJDNqTf0",
+      Authorization: Token,
     },
   });
 
@@ -173,8 +170,7 @@ const createCardIssue = async (publisherId, campaignId) => {
     payload,
     {
       headers: {
-        Authorization:
-          "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6ImFjY2VzcyJ9.eyJ1c2VyIjp7ImlkIjo5MzU0LCJlbWFpbCI6InRhbi5udEB1cmJveC52biJ9LCJwYXJ0bmVyVG9rZW4iOiJleUpoYkdjaU9pSlNVekkxTmlJc0luUjVjQ0k2SWtwWFZDSjkuZXlKbGVIQWlPakUyTnpZME16UXpNemNzSW1saGRDSTZNVFkyT0RZMU9ETXpOeXdpY0dGeWRHNWxjbDlwWkNJNk1UTXNJbkp2YkdWZmFXUWlPakl6T1Rnc0luVnpaWEpmYVdRaU9qa3pOVFI5LkpkWTcxdTZSUzhVckttWHg2RW9ybWwwdWpvVVk3OVZZMnNJaDQ2dk1jNl9OSWI2UFJveGN6XzJzb29TWENPbWxpVWc3b0FBQW9HT3NZWVJZdXVZOE5NSmNsSUZOc185WHJXcWlBZ19yenJEUXF3V3VIdXJNTk93bHl4V2czZmcxaDIzaS1FTS1nUVAtck5saVpaU2ZlSmJoMWxWUFRWRnlHbXlBUGJxcW1mdyIsImlhdCI6MTY2ODY1ODMzNywiZXhwIjoxNjY5MjYzMTM3LCJpc3MiOiJmZWF0aGVycyIsImp0aSI6ImUxNDNjMjc0LWYyMWEtNGY1NS05NzcyLWFkNmNiYzk1ZmE5YyJ9.qh0QGO35DGfFrW7F--z4GKXYppMbmTdcj81bJDNqTf0",
+        Authorization: Token,
       },
     }
   );
@@ -222,8 +218,7 @@ const importXlsx = async (cardIssueId, subPOId, type, code, ranks) => {
       {
         headers: {
           ...form.getHeaders(),
-          Authorization:
-            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6ImFjY2VzcyJ9.eyJ1c2VyIjp7ImlkIjo5MzU0LCJlbWFpbCI6InRhbi5udEB1cmJveC52biJ9LCJwYXJ0bmVyVG9rZW4iOiJleUpoYkdjaU9pSlNVekkxTmlJc0luUjVjQ0k2SWtwWFZDSjkuZXlKbGVIQWlPakUyTnpZME16UXpNemNzSW1saGRDSTZNVFkyT0RZMU9ETXpOeXdpY0dGeWRHNWxjbDlwWkNJNk1UTXNJbkp2YkdWZmFXUWlPakl6T1Rnc0luVnpaWEpmYVdRaU9qa3pOVFI5LkpkWTcxdTZSUzhVckttWHg2RW9ybWwwdWpvVVk3OVZZMnNJaDQ2dk1jNl9OSWI2UFJveGN6XzJzb29TWENPbWxpVWc3b0FBQW9HT3NZWVJZdXVZOE5NSmNsSUZOc185WHJXcWlBZ19yenJEUXF3V3VIdXJNTk93bHl4V2czZmcxaDIzaS1FTS1nUVAtck5saVpaU2ZlSmJoMWxWUFRWRnlHbXlBUGJxcW1mdyIsImlhdCI6MTY2ODY1ODMzNywiZXhwIjoxNjY5MjYzMTM3LCJpc3MiOiJmZWF0aGVycyIsImp0aSI6ImUxNDNjMjc0LWYyMWEtNGY1NS05NzcyLWFkNmNiYzk1ZmE5YyJ9.qh0QGO35DGfFrW7F--z4GKXYppMbmTdcj81bJDNqTf0",
+          Authorization: Token,
         },
       }
     );
