@@ -15,6 +15,12 @@ const { RemoveMarkAndSticker } = require("./utils/common");
 const { IdentifiedTypeImport } = require("./controller/portal-api/constant");
 const database = require("./firebase");
 require("dotenv").config();
+const { Configuration, OpenAIApi } = require("openai");
+
+const configuration = new Configuration({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+const openai = new OpenAIApi(configuration);
 
 async function increaseCounter(type, fromData) {
   const timeNow = new Date().getTime();
@@ -76,7 +82,7 @@ app.use(function (err, req, res, next) {
 });
 
 const bot = new Telegraf(process.env.botToken);
-//bot.start((ctx) => ctx.reply('Welcome'));
+bot.start((ctx) => ctx.reply("Hello, I'm dev bot~"));
 bot.help((ctx) => ctx.reply("Bạn cần mình chạy thưởng hay sinh nhật nè 👍"));
 bot.on("sticker", (ctx) => ctx.reply("👍"));
 //bot.hears("hi", (ctx) => ctx.reply("Hey there"));
@@ -214,6 +220,18 @@ bot.on("text", async (ctx) => {
       "<pre><b>Quick Functions of Urcard Dev</b>&#x200D;</pre>",
       keyboard.inline()
     );
+  } else {
+    const response = await openai.createCompletion({
+      model: "text-davinci-003",
+      prompt: message,
+      temperature: 0.7,
+      max_tokens: 290,
+      top_p: 1,
+      frequency_penalty: 0,
+      presence_penalty: 0,
+    });
+    console.log(response.data.choices, "response");
+    ctx.reply(response.data.choices[0].text);
   }
 });
 bot.on("callback_query", async (ctx) => {
