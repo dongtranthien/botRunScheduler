@@ -225,7 +225,7 @@ bot.on("text", async (ctx) => {
       model: "text-davinci-003",
       prompt: message,
       temperature: 0.7,
-      max_tokens: 290,
+      max_tokens: 1000,
       top_p: 1,
       frequency_penalty: 0,
       presence_penalty: 0,
